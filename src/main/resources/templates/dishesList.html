@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Меню ресторана | Панель управления</title>
+    <style>
+        /* Сброс и базовые стили */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* Шапка */
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Основной контент */
+        .content {
+            padding: 30px;
+        }
+
+        /* Кнопка добавления */
+        .add-btn {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+            background: linear-gradient(135deg, #219653 0%, #27ae60 100%);
+        }
+
+        .add-btn::before {
+            content: "+";
+            margin-right: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Таблица */
+        .dishes-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .dishes-table thead {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .dishes-table th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dishes-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .dishes-table tbody tr:hover {
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .dishes-table td {
+            padding: 18px 15px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: middle;
+        }
+
+        .dishes-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Чередование строк */
+        .dishes-table tbody tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        /* Стили для данных */
+        .dish-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.05rem;
+        }
+
+        .dish-price {
+            color: #27ae60;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .dish-price::after {
+            content: " ₽";
+        }
+
+        /* Кнопки действий */
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            border: 2px solid transparent;
+        }
+
+        .btn-view {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-edit {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #d68910;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Иконки для кнопок (псевдоэлементы) */
+        .btn-view::before {
+            content: "👁️";
+            margin-right: 6px;
+        }
+
+        .btn-edit::before {
+            content: "✏️";
+            margin-right: 6px;
+        }
+
+        .btn-delete::before {
+            content: "🗑️";
+            margin-right: 6px;
+        }
+
+        /* Состояние пустой таблицы */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        /* Подвал */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eef2f7;
+            margin-top: 30px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 8px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .dishes-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .add-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .dishes-table th,
+            .dishes-table td {
+                padding: 12px 8px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Анимация появления строк */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dishes-table tbody tr {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .dishes-table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+        .dishes-table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+        .dishes-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+        .dishes-table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+        .dishes-table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+
+    <!-- Основной контент -->
+    <main class="content">
+        <!-- Кнопка добавления -->
+        <a th:href="@{/categorys/dishes/new}" class="add-btn">Добавить новое блюдо</a>
+
+        <!-- Таблица блюд -->
+        <table class="dishes-table">
+            <thead>
+            <tr>
+                <th>Название блюда</th>
+                <th>Цена</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Если есть блюда -->
+            <tr th:each="dish : ${dishes}">
+                <td class="dish-title" th:text="${dish.title}">Название блюда</td>
+                <td class="dish-price" th:text="${dish.price}">0</td>
+                <td>
+                    <div class="actions">
+                        <a th:href="@{/categorys/dishes/components/{id}(id=${dish.dishesId})}"
+                           class="btn btn-view">
+                            Компоненты
+                        </a>
+                        <a th:href="@{/dishes/edit/{id}(id=${dish.dishesId})}"
+                           class="btn btn-edit">
+                            Редактировать
+                        </a>
+                        <a th:href="@{/categorys/dishes/delete/{id}(id=${dish.dishesId})}">
+                            Удалить
+                        </a>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- Если блюд нет -->
+            <tr th:unless="${dishes != null and !dishes.isEmpty()}">
+                <td colspan="3">
+                    <div class="empty-state">
+                        <p>📝 Блюд пока нет</p>
+                        <p>Нажмите "Добавить новое блюдо", чтобы создать первое блюдо в меню</p>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </main>
+
+
+</div>
+</body>
+</html>

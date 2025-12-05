@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система управления рестораном</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .add-category-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .categories-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .category-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 200px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .category-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .category-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .view-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        .edit-btn {
+            background-color: #FFC107;
+            color: black;
+        }
+        .delete-btn {
+            background-color: #F44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Категории блюд</h1>
+    <a class="add-category-btn" th:href="@{/categorys/new}">Добавить категорию</a>
+</div>
+
+<div class="categories-container">
+    <div class="category-card" th:each="TypeOfDish: ${types_of_dishes}">
+        <div class="category-title" th:text="${TypeOfDish.title}"></div>
+
+        <a class="action-btn view-btn"
+           th:href="@{/categorys/dishes/{id}(id=${TypeOfDish.codeType})}">
+            Посмотреть блюда
+        </a>
+
+        <div class="category-actions">
+            <a class="action-btn edit-btn"
+               th:href="@{/categorys/edit/{id}(id=${TypeOfDish.codeType})}">
+                Изменить
+            </a>
+            <a class="action-btn delete-btn"
+               th:href="@{/categorys/delete/{id}(id=${TypeOfDish.codeType})}">
+                Удалить
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

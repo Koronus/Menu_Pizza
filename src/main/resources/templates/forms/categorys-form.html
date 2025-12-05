@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+</head>
+<body>
+
+<h2 th:text="${types_of_dishes.codeType == null} ? 'Добавить категорию' : 'Изменить'"></h2>
+<form th:action="@{/categorys/save}" th:object ="${types_of_dishes}" method="post">
+    <input type="hidden" th:field="*{codeType}"/>
+    <label for="name">Название категории</label>
+    <input type="text" th:field="*{title}" id="name"> <br>
+    <button type="submit">Сохранить</button>
+
+</form>
+
+<a th:href="@{/categorys}">Назад к выбору категории</a>
+
+</body>
+</html>

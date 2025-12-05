@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+</head>
+<body>
+<h2 th:text="${dish.dishesId == null} ? 'Добавить блюдо' : 'Изменить'"></h2>
+<form th:action="@{/categorys/dishes/save}" th:object ="${dish}" method="post">
+    <input type="hidden" th:field="*{dishesId}"/>
+
+
+
+    <label for="name">Название блюда</label>
+    <input type="text" th:field="*{title}" id="name"> <br>
+
+    <label for="price">Цена</label>
+    <input type="text" th:field="*{price}" id="price"> <br>
+
+
+
+    <button type="submit">Сохранить</button>
+
+</form>
+
+</body>
+</html>

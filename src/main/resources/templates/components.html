@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Компоненты блюда</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .empty-message {
+            color: red;
+            padding: 20px;
+            border: 1px solid red;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Компоненты блюда</h1>
+
+<!-- Информация о блюде -->
+<div th:if="${dish != null}">
+    <h2>Блюдо: <span th:text="${dish.title}"></span></h2>
+    <p>Цена блюда: <span th:text="${dish.price}"></span> руб.</p>
+</div>
+
+<!-- Ссылка назад -->
+<a th:href="@{/dishes}">← Назад к списку блюд</a>
+
+<!-- Таблица компонентов -->
+<div th:if="${compositions != null and !compositions.isEmpty()}">
+    <h3>Состав блюда (компоненты):</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Компонент</th>
+            <th>Количество</th>
+            <th>Цена за единицу</th>
+            <th>Общая стоимость</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- ВАЖНО: compositions, а не components! -->
+        <tr th:each="comp, iterStat : ${compositions}">
+            <td th:text="${iterStat.count}">1</td>
+
+            <!-- Проверяем, есть ли component объект -->
+            <td>
+                        <span th:if="${comp.component != null}"
+                              th:text="${comp.component.title}">Название компонента</span>
+                <span th:unless="${comp.component != null}" style="color: gray;">
+                            Компонент ID: <span th:text="${comp.componentId}"></span>
+                        </span>
+            </td>
+
+            <td th:text="${comp.quantity}">0</td>
+
+            <td>
+                        <span th:if="${comp.component != null}"
+                              th:text="${comp.component.price}">0</span>
+                <span th:unless="${comp.component != null}">-</span> руб.
+            </td>
+
+            <td>
+                        <span th:if="${comp.component != null}"
+                              th:text="${comp.quantity * comp.component.price}">0</span>
+                <span th:unless="${comp.component != null}">-</span> руб.
+            </td>
+        </tr>
+        </tbody>
+        <tfoot th:if="${dish != null}">
+        <tr>
+            <td colspan="4" style="text-align: right;"><strong>Итого (цена блюда):</strong></td>
+            <td><strong th:text="${dish.price}">0</strong> руб.</td>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- Сообщение, если компонентов нет -->
+<div th:if="${compositions == null or compositions.isEmpty()}" class="empty-message">
+    <p>⚠️ Для этого блюда еще не добавлены компоненты.</p>
+
+    <div th:if="${allComponents != null and !allComponents.isEmpty()}">
+        <p>Доступные компоненты для добавления:</p>
+        <ul>
+            <li th:each="comp : ${allComponents}">
+                <span th:text="${comp.title}"></span> (ID: <span th:text="${comp.codeComponent}"></span>)
+                - <span th:text="${comp.price}"></span> руб.
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Кнопка для добавления нового компонента к блюду -->
+<div style="margin-top: 30px;">
+    <a th:href="@{/dishes/{dishId}/components/add(dishId=${dish.dishesId})}"
+       style="background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+        ➕ Добавить компонент к этому блюду
+    </a>
+</div>
+<!-- Кнопка для удаления компонента блюда -->
+<div style="margin-top: 30px;">
+    <a th:href="@{/dishes/{dishId}/components/delete(dishId=${dish.dishesId})}"
+       style="background-color: red; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+        ❌  Удалить компонент этого блюда
+    </a>
+</div>
+</body>
+</html>
