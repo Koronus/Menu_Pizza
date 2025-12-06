@@ -332,7 +332,9 @@
     <!-- Основной контент -->
     <main class="content">
         <!-- Кнопка добавления -->
-        <a th:href="@{/categorys/dishes/new}" class="add-btn">Добавить новое блюдо</a>
+
+            <a th:href="@{/categorys/dishes/new/{id}(id=${categoryId})}" class="add-btn">Добавить новое блюдо</a>
+
 
         <!-- Таблица блюд -->
         <table class="dishes-table">
@@ -354,11 +356,12 @@
                            class="btn btn-view">
                             Компоненты
                         </a>
-                        <a th:href="@{/dishes/edit/{id}(id=${dish.dishesId})}"
+                        <a th:href="@{/categorys/dishes/edit/{id}(id=${dish.dishesId})}"
                            class="btn btn-edit">
                             Редактировать
                         </a>
-                        <a th:href="@{/categorys/dishes/delete/{id}(id=${dish.dishesId})}">
+                        <a th:href="@{/categorys/dishes/delete/{id}(id=${dish.dishesId})}"
+                            class="btn btn-delete">
                             Удалить
                         </a>
                     </div>

@@ -33,35 +33,55 @@ public class DisheController {
         return "dishesList";
     }
 
-    @GetMapping("/new")
-    public String newDishe(Model model){
-
-        Dishe dish =new Dishe();
-
-        //TypeOfDish category = typeOfDishService.getTypeOfDishById(categoryId);
-        //dish.setTypeOfDish(category); // ← устанавливаем полный объект
-
-        //dish.setTypeOfDish(category);
-
-        model.addAttribute("dish",dish);
-       // model.addAttribute("category",categoryId);
+    @GetMapping("/new/{categoryId}")
+    public String createDishForm(@PathVariable("categoryId") Integer categoryId, Model model) {
+        // Передаем ID категории в модель
 
 
+        // Получаем категорию из БД
+        TypeOfDish category = typeOfDishService.getTypeOfDishById(categoryId);
+
+        // Создаем новое пустое блюдо
+        Dishe dish = new Dishe();
+
+        dish.setTypeOfDish(category);
+
+        model.addAttribute("dish", dish);
         return "forms/dishes-form";
     }
 
     @PostMapping("/save")
     public String saveDishe(@ModelAttribute("Dishe") Dishe dishe)
     {
+        // Сохраняем блюдо
         disheService.saveDishe(dishe);
-        return "redirect:/dishes";
+
+        // Получаем ID категории из сохраненного блюда
+        Integer categoryId = dishe.getTypeOfDish().getCodeType();
+
+        // Перенаправляем на страницу категории
+        return "redirect:/categorys/dishes/" + categoryId;
     }
 
-    // Удалить блюдо (простой путь)
+    //Измениить блюдо
+    @GetMapping("/edit/{id}")
+    public String editTypeOfDish(@PathVariable("id") Integer id, Model model)
+    {
+        model.addAttribute("dish",disheService.findById(id));
+        return "forms/dishes-form";
+    }
+
+    // Удалить блюдо
     @GetMapping("/delete/{id}")
     public String deleteDish(@PathVariable("id") Integer dishId) {
+        // Получаем блюдо, чтобы узнать его категорию
+        Dishe dish = disheService.findById(dishId);
+        Integer categoryId = dish.getTypeOfDish().getCodeType();
+
         disheService.deleteDishe(dishId);
-        return "redirect:/dishes";
+
+        // Перенаправляем обратно в категорию
+        return "redirect:/categorys/dishes/" + categoryId;
     }
 }
 
