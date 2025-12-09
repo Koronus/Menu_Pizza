@@ -10,6 +10,7 @@
 <h2 th:text="${types_of_dishes.codeType == null} ? 'Добавить категорию' : 'Изменить'"></h2>
 <form th:action="@{/categorys/save}" th:object ="${types_of_dishes}" method="post">
     <input type="hidden" th:field="*{codeType}"/>
+
     <label for="name">Название категории</label>
     <input type="text" th:field="*{title}" id="name"> <br>
     <button type="submit">Сохранить</button>

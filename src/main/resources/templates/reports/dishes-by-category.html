@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчет: Блюда по категориям</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: #4f46e5;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+
+        .summary-item h3 {
+            font-size: 1.5rem;
+            color: #4f46e5;
+            margin-bottom: 5px;
+        }
+
+        .summary-item p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #4f46e5;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #10b981;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Шапка -->
+    <div class="header">
+        <h1>🍽️ Блюда по категориям</h1>
+        <p>Анализ блюд по категориям: количество, стоимость и доля в выручке</p>
+    </div>
+
+    <!-- Управление -->
+    <form method="get" class="controls">
+        <div class="filter-group">
+            <label for="category">Категория:</label>
+            <select id="category" name="categoryId">
+                <option value="">Все категории</option>
+                <option th:each="category : ${categories}"
+                        th:value="${category.codeType}"
+                        th:text="${category.title}"
+                        th:selected="${selectedCategoryId != null and category.codeType == selectedCategoryId}">
+                </option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="sort">Сортировка:</label>
+            <select id="sort" name="sortBy">
+                <option value="">По умолчанию</option>
+                <option value="name" th:selected="${sortBy == 'name'}">По названию</option>
+                <option value="dishes" th:selected="${sortBy == 'dishes'}">По количеству блюд</option>
+                <option value="price" th:selected="${sortBy == 'price'}">По стоимости</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Применить фильтры</button>
+        <a th:href="@{/reports/dishes-by-category}" class="btn btn-secondary">Сбросить</a>
+    </form>
+
+    <!-- Сводка -->
+    <div class="summary-card">
+        <div class="summary-item">
+            <h3 th:text="${#lists.size(reportData)}">0</h3>
+            <p>Категорий</p>
+        </div>
+        <div class="summary-item">
+            <h3 id="totalDishes">0</h3>
+            <p>Всего блюд</p>
+        </div>
+        <div class="summary-item">
+            <h3 th:text="${totalRevenue != null ? #numbers.formatCurrency(totalRevenue) : '0.00'}">0.00</h3>
+            <p>Общая стоимость</p>
+        </div>
+        <div class="summary-item">
+            <h3 id="avgPrice">0.00</h3>
+            <p>Средняя стоимость категории</p>
+        </div>
+    </div>
+
+    <!-- Таблица -->
+    <div class="table-container">
+        <table id="reportTable">
+            <thead>
+            <tr>
+                <th>Категория</th>
+                <th>Кол-во блюд</th>
+                <th>Общая стоимость</th>
+                <th>Средняя цена</th>
+                <th>Доля в выручке</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${reportData}">
+                <td th:text="${item.categoryName}">Категория</td>
+                <td class="dish-count" th:text="${item.dishCount}">0</td>
+                <td th:text="${item.totalPrice != null ? #numbers.formatCurrency(item.totalPrice) : '0.00'}">
+                    0.00
+                </td>
+                <td th:text="${item.avgPrice != null ? #numbers.formatCurrency(item.avgPrice) : '0.00'}">
+                    0.00
+                </td>
+                <td>
+                            <span th:text="${item.revenueShare != null ? #numbers.formatDecimal(item.revenueShare, 1, 2) + '%' : '0.00%'}">
+                                0.00%
+                            </span>
+                    <div class="progress-bar">
+                        <div class="progress-fill"
+                             th:if="${item.revenueShare != null}"
+                             th:style="'width: ' + ${#numbers.formatDecimal(item.revenueShare, 1, 2)} + '%;'">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Действия -->
+    <div class="actions">
+        <a th:href="@{/reports}" class="btn btn-secondary">
+            ← Назад к отчетам
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            📄 Распечатать отчет
+        </button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Подсчет общего количества блюд
+        const dishCountCells = document.querySelectorAll('.dish-count');
+        let totalDishes = 0;
+
+        dishCountCells.forEach(cell => {
+            const count = parseInt(cell.textContent.trim()) || 0;
+            totalDishes += count;
+        });
+
+        // Обновляем отображение общего количества блюд
+        document.getElementById('totalDishes').textContent = totalDishes;
+
+        // Подсчет средней стоимости
+        const totalRevenueElement = document.querySelector('.summary-item:nth-child(3) h3');
+        const totalRevenueText = totalRevenueElement.textContent.replace(/[^\d.,]/g, '').replace(',', '.');
+        const totalRevenueValue = parseFloat(totalRevenueText) || 0;
+
+        const categoriesCount = document.querySelector('.summary-item:first-child h3').textContent;
+        const categoriesCountValue = parseInt(categoriesCount) || 1;
+
+        if (totalRevenueValue > 0 && categoriesCountValue > 0) {
+            const avgPrice = totalRevenueValue / categoriesCountValue;
+            document.getElementById('avgPrice').textContent = avgPrice.toFixed(2);
+        }
+
+        // Добавляем форматирование валюты
+        formatCurrency();
+    });
+
+    function formatCurrency() {
+        // Форматируем все элементы с валютами
+        const currencyElements = document.querySelectorAll('td:nth-child(3), td:nth-child(4)');
+        currencyElements.forEach(element => {
+            const text = element.textContent.trim();
+            if (text !== '0.00' && !text.includes('₽') && !text.includes('$') && !text.includes('€')) {
+                element.textContent = parseFloat(text).toFixed(2) + ' ₽';
+            }
+        });
+    }
+</script>
+</body>
+</html>

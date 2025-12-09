@@ -23,4 +23,10 @@ public class ComponentService {
         return componentRepository.findAll();
     }
 
+    public Component findById(Integer id) {
+        return componentRepository.findById(id).orElseThrow(() -> new RuntimeException("Блюдо с ID " + id + " не найдено"));
+    }
+
+    public void saveComponent(Component component) { componentRepository.save(component);}
+
 }

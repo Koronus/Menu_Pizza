@@ -13,9 +13,15 @@ public class Component {
     @Column(name = "code_component")
     private Integer codeComponent;
 
+    @Column(name = "title")
     private String title;
+
+    @Column(name = "calorie")
     private BigDecimal calorie;
+    @Column(name = "price")
+
     private BigDecimal price;
+    @Column(name = "weight")
     private BigDecimal weight;
 
     @OneToMany(mappedBy = "component")

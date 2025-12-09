@@ -14,6 +14,22 @@ public interface DisheRepository extends JpaRepository<Dishe, Integer> {
     @Query("SELECT d FROM Dishe d WHERE d.typeOfDish.codeType = :categoryId")
     List<Dishe> findByCategory(@Param("categoryId") Integer categoryId);
 
+    // Для отчета 1: количество блюд по всем категориям
+    @Query("SELECT c.title, COUNT(d), SUM(d.price), AVG(d.price) " +
+            "FROM Dishe d JOIN d.typeOfDish c " +
+            "GROUP BY c.codeType, c.title")
+    List<Object[]> findDishesCountByAllCategories();
+
+    // Для отчета 1: для конкретной категории
+    @Query("SELECT c.title, COUNT(d), SUM(d.price), AVG(d.price) " +
+            "FROM Dishe d JOIN d.typeOfDish c " +
+            "WHERE c.codeType = :categoryId " +
+            "GROUP BY c.codeType, c.title")
+    List<Object[]> findDishesCountByCategoryId(@Param("categoryId") Integer categoryId);
+
+    // Найти блюда по категории
+    List<Dishe> findByTypeOfDish_CodeType(Integer categoryId);
+
 
 
 }

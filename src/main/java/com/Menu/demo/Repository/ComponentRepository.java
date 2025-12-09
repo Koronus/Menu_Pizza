@@ -21,21 +21,18 @@ public interface ComponentRepository extends JpaRepository<Component, Integer> {
 
     List<Component> findByTitleContainingIgnoreCase(String title);
 
-    List<Component> findByCalorieGreaterThan(BigDecimal calorie);
-
     List<Component> findByPriceLessThan(BigDecimal price);
 
-//    // Компоненты, которые НЕ добавлены в блюдо (для выпадающего списка)
-//    @Query("SELECT c FROM Component c WHERE c.codeComponent NOT IN " +
-//            "(SELECT cd.component.codeComponent FROM CompositionDish cd WHERE cd.dish.dishesID = :dishId)")
-//    List<Component> findAvailableComponentsForDish(@Param("dishId") Integer dishId);
-//
-//    // Компоненты, используемые в блюдах определенной категории
-//    @Query("SELECT DISTINCT c FROM Component c " +
-//            "JOIN CompositionDish cd ON c.codeComponent = cd.component.codeComponent " +
-//            "JOIN cd.dish d " +
-//            "JOIN d.typeOfDish t " +
-//            "WHERE t.codeType = :categoryId")
-//    List<Component> findComponentsByCategoryId(@Param("categoryId") Integer categoryId);
+    // Компоненты с фильтрацией по цене
+    @Query("SELECT c FROM Component c " +
+            "WHERE (:minPrice IS NULL OR c.price >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR c.price <= :maxPrice) " +
+            "ORDER BY c.price DESC")
+    List<Component> findByPriceRange(
+            @Param("minPrice") BigDecimal minPrice,
+            @Param("maxPrice") BigDecimal maxPrice);
+
+    // Компоненты с калорийностью выше указанной
+    List<Component> findByCalorieGreaterThan(BigDecimal calorie);
 }
 

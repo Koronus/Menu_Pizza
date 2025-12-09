@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Микроэлементы компонента</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            border: 2px solid transparent;
+        }
+
+        .btn-view {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-edit {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #d68910;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        /* Иконки для кнопок (псевдоэлементы) */
+        .btn-view::before {
+            content: "👁️";
+            margin-right: 6px;
+        }
+
+        .btn-edit::before {
+            content: "✏️";
+            margin-right: 6px;
+        }
+
+        .btn-delete::before {
+            content: "🗑️";
+            margin-right: 6px;
+        }
+
+        .empty-message {
+            color: red;
+            padding: 20px;
+            border: 1px solid red;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Микроэлементы компонента</h1>
+
+<!-- Информация о компоненте -->
+<div th:if="${component != null}">
+    <h2>Компонент: <span th:text="${component.title}"></span></h2>
+    <p>Цена компонента: <span th:text="${component.price}"></span> руб.</p>
+    <p>Код компонента: <span th:text="${component.codeComponent}"></span></p>
+</div>
+
+<!-- Ссылка назад -->
+<a th:href="@{/categorys/dishes/components}">← Назад к списку компонентов</a>
+
+<!-- Таблица микроэлементов -->
+<div th:if="${compositions != null and !compositions.isEmpty()}">
+    <h3>Состав микроэлементов компонента:</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>ID микроэлемента</th>
+            <th>Название микроэлемента</th>
+            <th>Количество на 100 г</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- comp.microelement, а не comp.component! -->
+        <tr th:each="comp, iterStat : ${compositions}">
+            <td th:text="${iterStat.count}">1</td>
+
+            <!-- ID микроэлемента -->
+            <td>
+                <span th:text="${comp.microelement.codeMicroelement}"></span>
+            </td>
+
+            <!-- Название микроэлемента -->
+            <td>
+                <span th:if="${comp.microelement != null}"
+                      th:text="${comp.microelement.name}">Название микроэлемента</span>
+                <span th:unless="${comp.microelement != null}" style="color: gray;">
+                    Микроэлемент ID: <span th:text="${comp.microelementId}"></span>
+                </span>
+            </td>
+
+            <!-- Количество -->
+            <td th:text="${comp.quantityPer100}">0</td>
+
+            <!-- Действия -->
+            <td>
+                <!-- Исправьте ссылки на microelement, а не на dish! -->
+                <a th:href="@{/categorys/dishes/components/microelements/{componentId}/edit/{microId}(componentId=${component.codeComponent}, microId=${comp.microelement.codeMicroelement})}"
+                   class="btn btn-edit">
+                    Редактировать
+                </a>
+
+                <a th:href="@{/categorys/dishes/components/microelements/{componentId}/delete/{microId}(componentId=${component.codeComponent}, microId=${comp.microelement.codeMicroelement})}"
+                   class="btn btn-delete">
+                    Удалить
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Сообщение, если микроэлементов нет -->
+<div th:if="${compositions == null or compositions.isEmpty()}" class="empty-message">
+    <p>⚠️ Для этого компонента еще не добавлены микроэлементы.</p>
+
+    <div th:if="${allMicroelements != null and !allMicroelements.isEmpty()}">
+        <p>Доступные микроэлементы для добавления:</p>
+        <ul>
+            <!-- Исправьте: allMicroelements, а не allComponents! -->
+            <li th:each="microelement : ${allMicroelements}">
+                <span th:text="${microelement.title}"></span>
+                (ID: <span th:text="${microelement.codeMicroelement}"></span>)
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Форма для добавления нового микроэлемента -->
+<div style="margin-top: 30px; border: 1px solid #ccc; padding: 20px; border-radius: 5px;">
+    <h3>Добавить новый микроэлемент к компоненту:</h3>
+    <form th:action="@{/categorys/dishes/components/microelements/{componentId}/add(componentId=${component.codeComponent})}"
+          method="post">
+        <div style="margin-bottom: 15px;">
+            <label for="microelementId">Выберите микроэлемент:</label>
+            <select id="microelementId" name="microelementId" required style="width: 100%; padding: 8px;">
+                <option value="">-- Выберите микроэлемент --</option>
+                <option th:each="microelement : ${allMicroelements}"
+                        th:value="${microelement.codeMicroelement}"
+                        th:text="${microelement.title} + ' (ID: ' + ${microelement.codeMicroelement} + ')'">
+                </option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="quantityPer100">Количество на 100 г:</label>
+            <input type="number" id="quantityPer100" name="quantityPer100"
+                   step="0.01" min="0" required style="width: 100%; padding: 8px;">
+        </div>
+
+        <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px;
+                text-decoration: none; border-radius: 5px; border: none; cursor: pointer;">
+            ➕ Добавить микроэлемент
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

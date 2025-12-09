@@ -1,5 +1,6 @@
 package com.Menu.demo.Service;
 
+import com.Menu.demo.Entity.Component;
 import com.Menu.demo.Entity.CompositionDish;
 import com.Menu.demo.Repository.CompositionDishRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class CompositionDisheService {
         // Или вариант 2, если используете @Query:
         // return compositionDishRepository.findByDishId(dishId);
     }
+
+
+    public void saveCompositionDishe(CompositionDish compositionDish) { compositionDishRepository.save(compositionDish);}
 
 //    public List<CompositionDish> findById(Integer dishId, Integer componentId) {
 //        return compositionDishRepository.findByDishIdAndComponentId(dishId, componentId)

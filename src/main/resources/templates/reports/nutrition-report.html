@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчет: Анализ питательности</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f9ff;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .summary-item h3 {
+            font-size: 1.8rem;
+            color: #059669;
+            margin-bottom: 5px;
+        }
+
+        .summary-item p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.3s;
+        }
+
+        tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        td {
+            padding: 15px;
+            color: #4b5563;
+            vertical-align: top;
+        }
+
+        .microelements-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .microelements-list li {
+            padding: 3px 0;
+            font-size: 0.9rem;
+            color: #6b7280;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .value-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #d1fae5;
+            color: #065f46;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-high {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-medium {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .badge-low {
+            background: #f7fee7;
+            color: #3f6212;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(5, 150, 105, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .nutrition-score {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin: 0 auto;
+        }
+
+        .score-high {
+            background: #dcfce7;
+            color: #166534;
+            border: 3px solid #86efac;
+        }
+
+        .score-medium {
+            background: #fef3c7;
+            color: #92400e;
+            border: 3px solid #fcd34d;
+        }
+
+        .score-low {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 3px solid #fca5a5;
+        }
+
+        @media (max-width: 768px) {
+            .summary-card {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Шапка -->
+    <div class="header">
+        <h1>📈 Отчет по питательности</h1>
+        <p>Анализ питательной ценности компонентов: калории, микроэлементы и стоимость питания</p>
+    </div>
+
+    <!-- Сводка -->
+    <div class="summary-card">
+        <div class="summary-item">
+            <h3 th:text="${#lists.size(reportData)}">0</h3>
+            <p>Компонентов проанализировано</p>
+        </div>
+        <div class="summary-item">
+            <h3 th:text="${totalCalories != null ? #numbers.formatDecimal(totalCalories, 0, 0) : '0'}">0</h3>
+            <p>Всего калорий</p>
+        </div>
+        <div class="summary-item">
+            <h3 th:text="${totalPrice != null ? #numbers.formatCurrency(totalPrice) : '0.00'}">0.00</h3>
+            <p>Общая стоимость</p>
+        </div>
+        <div class="summary-item">
+            <h3 id="avgCaloriesPerRuble">0.00</h3>
+            <p>Калорий на 1 рубль (среднее)</p>
+        </div>
+    </div>
+
+    <!-- Таблица -->
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Компонент</th>
+                <th>Калории</th>
+                <th>Стоимость</th>
+                <th>Ценность (кал/руб)</th>
+                <th>Микроэлементы</th>
+                <th>Общее кол-во микроэлементов</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${reportData}">
+                <td th:text="${item.componentName}">Компонент</td>
+
+                <td>
+                    <div class="value-badge" th:text="${item.calorie != null ? #numbers.formatDecimal(item.calorie, 0, 0) : '0'}">
+                        0
+                    </div>
+                </td>
+
+                <td th:text="${item.price != null ? #numbers.formatCurrency(item.price) : '0.00'}">
+                    0.00
+                </td>
+
+                <td>
+                    <div th:if="${item.caloriePerRuble != null}" class="nutrition-score"
+                         th:attr="data-value=${item.caloriePerRuble}">
+                                <span th:text="${#numbers.formatDecimal(item.caloriePerRuble, 1, 1)}">
+                                    0.0
+                                </span>
+                    </div>
+                    <div th:if="${item.caloriePerRuble == null}" class="nutrition-score">
+                        0.0
+                    </div>
+                </td>
+
+                <td>
+                    <ul class="microelements-list" th:if="${not #lists.isEmpty(item.microelements)}">
+                        <li th:each="micro : ${item.microelements}">
+                            <span th:text="${micro.microelementName}">Микроэлемент</span>
+                            <span th:text="${micro.quantityPer100 != null ? #numbers.formatDecimal(micro.quantityPer100, 1, 2) : '0.00'}">
+                                        0.00
+                                    </span>
+                        </li>
+                    </ul>
+                    <span th:if="${#lists.isEmpty(item.microelements)}" style="color: #9ca3af;">
+                                Нет данных
+                            </span>
+                </td>
+
+                <td>
+                    <div th:if="${item.totalMicroelements != null}"
+                         class="value-badge"
+                         th:attr="data-value=${item.totalMicroelements}">
+                                <span th:text="${#numbers.formatDecimal(item.totalMicroelements, 1, 2)}">
+                                    0.00
+                                </span>
+                    </div>
+                    <div th:if="${item.totalMicroelements == null}" class="value-badge">
+                        0.00
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Действия -->
+    <div class="actions">
+        <a th:href="@{/reports}" class="btn btn-secondary">
+            ← Назад к отчетам
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            📄 Распечатать отчет
+        </button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Расчет средних калорий на рубль
+        const totalCaloriesElement = document.querySelector('.summary-item:nth-child(2) h3');
+        const totalPriceElement = document.querySelector('.summary-item:nth-child(3) h3');
+        const avgElement = document.getElementById('avgCaloriesPerRuble');
+
+        if (totalCaloriesElement && totalPriceElement && avgElement) {
+            const totalCalories = parseFloat(totalCaloriesElement.textContent.replace(/\s/g, '')) || 0;
+            const totalPriceText = totalPriceElement.textContent.replace(/[^\d.,]/g, '').replace(',', '.');
+            const totalPrice = parseFloat(totalPriceText) || 0;
+
+            if (totalPrice > 0) {
+                const avgCaloriesPerRuble = totalCalories / totalPrice;
+                avgElement.textContent = avgCaloriesPerRuble.toFixed(2);
+            }
+        }
+
+        // Цветовое кодирование для оценки ценности
+        const scoreCells = document.querySelectorAll('.nutrition-score');
+        scoreCells.forEach(cell => {
+            const valueAttr = cell.getAttribute('data-value');
+            if (valueAttr) {
+                const value = parseFloat(valueAttr);
+                cell.classList.remove('score-high', 'score-medium', 'score-low');
+
+                if (value > 50) {
+                    cell.classList.add('score-high');
+                    cell.title = 'Высокая питательная ценность: ' + value.toFixed(1) + ' кал/руб';
+                } else if (value > 20) {
+                    cell.classList.add('score-medium');
+                    cell.title = 'Средняя питательная ценность: ' + value.toFixed(1) + ' кал/руб';
+                } else {
+                    cell.classList.add('score-low');
+                    cell.title = 'Низкая питательная ценность: ' + value.toFixed(1) + ' кал/руб';
+                }
+            } else {
+                cell.classList.add('score-low');
+                cell.title = 'Нет данных';
+            }
+        });
+
+        // Цветовое кодирование для общего количества микроэлементов
+        const microBadges = document.querySelectorAll('td:nth-child(6) .value-badge');
+        microBadges.forEach(badge => {
+            const valueAttr = badge.getAttribute('data-value');
+            if (valueAttr) {
+                const value = parseFloat(valueAttr);
+                badge.classList.remove('badge-high', 'badge-medium', 'badge-low');
+
+                if (value > 50) {
+                    badge.classList.add('badge-high');
+                } else if (value > 20) {
+                    badge.classList.add('badge-medium');
+                } else {
+                    badge.classList.add('badge-low');
+                }
+            } else {
+                badge.classList.add('badge-low');
+            }
+        });
+
+        // Цветовое кодирование для калорий
+        const calorieBadges = document.querySelectorAll('td:nth-child(2) .value-badge');
+        calorieBadges.forEach(badge => {
+            const value = parseFloat(badge.textContent) || 0;
+            if (value > 500) {
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#92400e';
+                badge.title = 'Высококалорийный компонент';
+            } else if (value > 200) {
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#92400e';
+                badge.title = 'Среднекалорийный компонент';
+            } else {
+                badge.title = 'Низкокалорийный компонент';
+            }
+        });
+
+        // Сортировка по клику на заголовки (опционально)
+        const table = document.querySelector('table');
+        if (table) {
+            const headers = table.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                header.style.cursor = 'pointer';
+                header.addEventListener('click', function() {
+                    sortTable(index);
+                });
+            });
+        }
+    });
+
+    function sortTable(columnIndex) {
+        const table = document.querySelector('table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a, b) => {
+            let aText, bText;
+
+            // Особые случаи для столбцов с бейджами и кружками
+            if (columnIndex === 1) { // Калории
+                aText = a.querySelector('td:nth-child(2) .value-badge')?.textContent || '0';
+                bText = b.querySelector('td:nth-child(2) .value-badge')?.textContent || '0';
+            } else if (columnIndex === 3) { // Ценность
+                aText = a.querySelector('td:nth-child(4) .nutrition-score')?.textContent || '0';
+                bText = b.querySelector('td:nth-child(4) .nutrition-score')?.textContent || '0';
+            } else if (columnIndex === 5) { // Микроэлементы
+                aText = a.querySelector('td:nth-child(6) .value-badge')?.textContent || '0';
+                bText = b.querySelector('td:nth-child(6) .value-badge')?.textContent || '0';
+            } else {
+                aText = a.children[columnIndex].textContent.trim();
+                bText = b.children[columnIndex].textContent.trim();
+            }
+
+            // Пытаемся преобразовать в числа
+            const aNum = parseFloat(aText.replace(/[^\d.,]/g, '').replace(',', '.'));
+            const bNum = parseFloat(bText.replace(/[^\d.,]/g, '').replace(',', '.'));
+
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                return bNum - aNum; // По убыванию
+            }
+
+            // Если не числа, сортируем как строки
+            return bText.localeCompare(aText);
+        });
+
+        // Очищаем и перезаполняем tbody
+        rows.forEach(row => tbody.appendChild(row));
+    }
+</script>
+</body>
+</html>

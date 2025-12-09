@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Компоненты блюда</title>
+</head>
+<body>
+
+<h2 th:text="${dish.dishesId == null} ? 'Добавить компонент' : 'Изменить'"></h2>
+<form th:action="@{/categorys/dishes/components/save}" th:object ="${component}"  method="post">
+
+    <!-- ВАЖНО: поле dishId должно быть! -->
+    <input type="hidden" name="dishId" th:value="${dishId}">
+
+    <input type="hidden" th:field="*{codeComponent}"/>
+
+
+    <label for="name">Название компонента</label>
+    <input type="text" th:field="*{title}" id="name"> <br>
+
+    <label for="price">Цена</label>
+    <input type="text" th:field="*{price}" id="price"> <br>
+
+    <label for="calorie">Каллории</label>
+    <input type="text" th:field="*{calorie}" id="calorie"> <br>
+
+    <label for="weight">Вес</label>
+    <input type="text" th:field="*{weight}" id="weight"> <br>
+
+    <label for="quantity">Количество</label>
+    <input type="number"  name="quantity" th:value="${quantity}"  id="quantity">
+
+    <button type="submit">Сохранить</button>
+
+</form>
+
+</body>
+</html>

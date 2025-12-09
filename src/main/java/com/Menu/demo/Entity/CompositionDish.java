@@ -15,13 +15,26 @@ public class CompositionDish {
     @Column(name = "code_component", insertable = false, updatable = false)
     private Integer componentId;  // ← Простое поле, не связь!
 
-    @ManyToOne
-    @JoinColumn(name = "dishesID", referencedColumnName = "dishesId")
-    private Dishe dish;  // ← Связь для получения объекта Dish
+//    @ManyToOne
+//    @JoinColumn(name = "dishesID", referencedColumnName = "dishesId")
+// УБРАТЬ @Transient и добавить реальные связи:
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "dishesID",
+            referencedColumnName = "dishesId",
+            insertable = false,  // ← Не вставлять при сохранении
+            updatable = false    // ← Не обновлять
+    )
+    private Dishe dish;
 
-    @ManyToOne
-    @JoinColumn(name = "code_component", referencedColumnName = "code_component")
-    private Component component;  // ← Связь для получения объекта Component
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "code_component",
+            referencedColumnName = "code_component",
+            insertable = false,  // ← Не вставлять при сохранении
+            updatable = false    // ← Не обновлять
+    )
+    private Component component;  // ← Теперь это реальное поле для связи
 
     @Column(name = "quantity")
     private Integer quantity;

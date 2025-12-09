@@ -6,62 +6,49 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Embeddable  // ← Помечаем как встраиваемый класс
 public class CompositionComponentId implements Serializable {
 
-    @Column(name = "code_component")
-    private Integer codeComponent;      // Первая часть ключа
+    //@Column(name = "code_component")
+    private Integer componentId;      // Первая часть ключа
 
-    @Column(name = "code_microelement")
-    private Integer codeMicroelement;   // Вторая часть ключа
+   // @Column(name = "code_microelement")
+    private Integer microelementId;   // Вторая часть ключа
 
     // ОБЯЗАТЕЛЬНО: конструктор по умолчанию
     public CompositionComponentId() {}
 
     // Конструктор с параметрами
-    public CompositionComponentId(Integer codeComponent, Integer codeMicroelement) {
-        this.codeComponent = codeComponent;
-        this.codeMicroelement = codeMicroelement;
+
+    public CompositionComponentId(Integer componentId, Integer microelementId) {
+        this.componentId = componentId;
+        this.microelementId = microelementId;
     }
 
-    // ОБЯЗАТЕЛЬНО: геттеры и сеттеры
-    public Integer getCodeComponent() {
-        return codeComponent;
+    public Integer getComponentId() {
+        return componentId;
     }
 
-    public void setCodeComponent(Integer codeComponent) {
-        this.codeComponent = codeComponent;
+    public void setComponentId(Integer componentId) {
+        this.componentId = componentId;
     }
 
-    public Integer getCodeMicroelement() {
-        return codeMicroelement;
+    public Integer getMicroelementId() {
+        return microelementId;
     }
 
-    public void setCodeMicroelement(Integer codeMicroelement) {
-        this.codeMicroelement = codeMicroelement;
+    public void setMicroelementId(Integer microelementId) {
+        this.microelementId = microelementId;
     }
 
-    // ОБЯЗАТЕЛЬНО: переопределить equals()
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CompositionComponentId)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         CompositionComponentId that = (CompositionComponentId) o;
-        return Objects.equals(codeComponent, that.codeComponent) &&
-                Objects.equals(codeMicroelement, that.codeMicroelement);
+        return Objects.equals(componentId, that.componentId) && Objects.equals(microelementId, that.microelementId);
     }
 
-    // ОБЯЗАТЕЛЬНО: переопределить hashCode()
     @Override
     public int hashCode() {
-        return Objects.hash(codeComponent, codeMicroelement);
-    }
-
-    @Override
-    public String toString() {
-        return "CompositionComponentID{" +
-                "codeComponent=" + codeComponent +
-                ", codeMicroelement=" + codeMicroelement +
-                '}';
+        return Objects.hash(componentId, microelementId);
     }
 }

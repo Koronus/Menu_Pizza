@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Анализ компонентов</title>
+</head>
+<body>
+
+<div class="back-btn">
+    <a th:href="@{/reports}">← Назад к списку отчетов</a>
+</div>
+
+<h1>🥗 Анализ компонентов</h1>
+
+<!-- Фильтры -->
+<div class="stats">
+    <form th:action="@{/reports/components-analysis}" method="get">
+        <label>Цена от:</label>
+        <input type="number" name="minPrice" step="0.01" th:value="${minPrice}">
+
+        <label>Цена до:</label>
+        <input type="number" name="maxPrice" step="0.01" th:value="${maxPrice}">
+
+        <button type="submit">Фильтровать</button>
+    </form>
+</div>
+
+<!-- Итоги -->
+<div class="stats">
+    <p>Всего компонентов: <strong th:text="${totalComponents}">0</strong></p>
+    <p>Общее использование в блюдах: <strong th:text="${totalUsage}">0</strong></p>
+</div>
+
+<!-- Таблица -->
+<table>
+    <thead>
+    <tr>
+        <th>Компонент</th>
+        <th>Цена</th>
+        <th>Калории</th>
+        <th>Вес</th>
+        <th>Используется в блюдах</th>
+        <th>Популярность</th>
+        <th>Блюда, где используется</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="comp : ${reportData}">
+        <td th:text="${comp.componentName}">Компонент</td>
+        <td th:text="${comp.price != null ? #numbers.formatDecimal(comp.price, 1, 2) : '-'}">-</td>
+        <td th:text="${comp.calorie != null ? #numbers.formatDecimal(comp.calorie, 1, 2) : '-'}">-</td>
+        <td th:text="${comp.weight != null ? #numbers.formatDecimal(comp.weight, 1, 2) : '-'}">-</td>
+        <td th:text="${comp.usedInDishes}">0</td>
+        <td>
+                <span th:if="${comp.usedInDishes > 5}" style="color: green;">
+                    Высокая
+                </span>
+            <span th:if="${comp.usedInDishes > 2 && comp.usedInDishes <= 5}" style="color: orange;">
+                    Средняя
+                </span>
+            <span th:if="${comp.usedInDishes <= 2}" style="color: #666;">
+                    Низкая
+                </span>
+        </td>
+        <td>
+                <span th:each="dish, stat : ${comp.dishNames}">
+                    <span th:text="${dish}"></span>
+                    <span th:if="${!stat.last}">, </span>
+                </span>
+            <span th:if="${comp.dishNames.isEmpty()}">Не используется</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

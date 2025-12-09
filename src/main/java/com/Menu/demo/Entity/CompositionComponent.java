@@ -6,18 +6,25 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "composition_components")
+@IdClass(CompositionComponentId.class)
 public class CompositionComponent {
-    @EmbeddedId
-    private CompositionComponentId id;
+
+
+    @Id
+    @Column(name = "code_component",insertable = false, updatable = false)
+    private Integer componentId;
+
+    @Id
+    @Column(name = "code_microelement",insertable = false, updatable = false)
+    private Integer microelementId;
+
 
     @ManyToOne
-    @MapsId("codeComponent")
-    @JoinColumn(name = "code_component")
+    @JoinColumn(name = "code_component",referencedColumnName = "code_component" )
     private Component component;
 
     @ManyToOne
-    @MapsId("codeMicroelement")
-    @JoinColumn(name = "code_microelement")
+    @JoinColumn(name = "code_microelement",referencedColumnName = "code_microelement")
     private Microelement microelement;
 
     @Column(name = "quantity_per_100")
