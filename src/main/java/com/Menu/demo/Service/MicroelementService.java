@@ -22,4 +22,11 @@ public class MicroelementService {
         return microelementRepository.findAll();
     }
 
+    public void saveMicroelement(Microelement microelement) { microelementRepository.save(microelement);}
+
+    public Microelement findById(Integer id) {
+        return microelementRepository.findById(id).orElseThrow(() -> new RuntimeException("Микроэлемент с ID " + id + " не найдено"));
+    }
+
+    public void deleteMicroelement(Integer id) {microelementRepository.deleteById(id);}
 }

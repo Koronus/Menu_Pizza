@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Микроэелементы блюда</title>
+</head>
+<body>
+
+<h2 th:text="${component.codeComponent == null} ? 'Изменить' : 'Добавить микроэлемент'"></h2>
+<form th:action="@{/categorys/dishes/components/microelements/save}" th:object ="${microelement}"  method="post">
+
+    <!-- ВАЖНО: поле componentId должно быть! -->
+    <input type="hidden" name="componentId" th:value="${componentId}">
+
+    <input type="hidden" th:field="*{codeMicroelement}"/>
+
+
+    <label for="name">Название микроэелемента</label>
+    <input type="text" th:field="*{title}" id="name"> <br>
+
+    <label for="quantity">Количество</label>
+    <input type="number"  name="quantity" th:value="${quantity}"  id="quantity">
+
+    <button type="submit">Сохранить</button>
+
+</form>
+
+</body>
+</html>

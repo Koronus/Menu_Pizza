@@ -12,13 +12,13 @@ public class Microelement {
     @Column(name = "code_microelement")
     private Integer codeMicroelement;
 
+    @Column(name = "title")
     private String title;
 
     @OneToMany(mappedBy = "microelement")
     private List<CompositionComponent> compositionComponents;
 
-    @OneToOne(mappedBy = "microelement")
-    private DailyRecruitment dailyRecruitment;
+
 
     public Microelement() {}
 
@@ -26,7 +26,7 @@ public class Microelement {
         this.codeMicroelement = codeMicroelement;
         this.title = title;
         this.compositionComponents = compositionComponents;
-        this.dailyRecruitment = dailyRecruitment;
+
     }
 
     public Integer getCodeMicroelement() {
@@ -53,14 +53,8 @@ public class Microelement {
         this.compositionComponents = compositionComponents;
     }
 
-    public DailyRecruitment getDailyRecruitment() {
-        return dailyRecruitment;
-    }
 
-    public void setDailyRecruitment(DailyRecruitment dailyRecruitment) {
-        this.dailyRecruitment = dailyRecruitment;
-    }
 
-    // Конструкторы, геттеры, сеттеры
+
 }
 

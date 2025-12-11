@@ -78,7 +78,7 @@
         }
 
         .add-btn::before {
-            content: "+";
+
             margin-right: 10px;
             font-size: 1.2rem;
             font-weight: bold;
@@ -331,9 +331,9 @@
 
     <!-- Основной контент -->
     <main class="content">
+        <a th:href="@{/categorys}" class="add-btn">Вернуться в категории</a>
         <!-- Кнопка добавления -->
-
-            <a th:href="@{/categorys/dishes/new/{id}(id=${categoryId})}" class="add-btn">Добавить новое блюдо</a>
+        <a th:href="@{/categorys/dishes/new/{id}(id=${categoryId})}" class="add-btn">+Добавить новое блюдо</a>
 
 
         <!-- Таблица блюд -->

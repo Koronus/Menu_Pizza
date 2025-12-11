@@ -3,7 +3,6 @@ package com.Menu.demo.Controller;
 import com.Menu.demo.Entity.Component;
 import com.Menu.demo.Entity.CompositionDish;
 import com.Menu.demo.Entity.Dishe;
-import com.Menu.demo.Entity.TypeOfDish;
 import com.Menu.demo.Service.ComponentService;
 import com.Menu.demo.Service.CompositionDisheService;
 import com.Menu.demo.Service.DisheService;
@@ -101,16 +100,49 @@ public class ComponentController {
         return "redirect:/categorys/dishes/components/" + dishesId ;
     }
 
-//    //Измениить блюдо
-//    @GetMapping("/edit/{dishId}")
-//    public String editTypeOfDish(@PathVariable("id") Integer id, Model model)
-//    {
-//        model.addAttribute("dish", dishService.findById(id));
-//        model.addAttribute("dishId", dishService.findById(id).getDishesId());
-//        model.addAttribute("component", componentService.findById());
-//        model.addAttribute("quantity", 1);
-//        return "forms/dishes-form";
-//    }
+    // Редактирование существующего компонента в составе блюда
+    @GetMapping("/edit/{dishId}/{componentId}")
+    public String editComponentInDish(@PathVariable("dishId") Integer dishId,
+                                      @PathVariable("componentId") Integer componentId,
+                                      Model model) {
+
+        // Находим связь между блюдом и компонентом
+        CompositionDish compositionDish = compositionDishService.findByDishIdAndComponentId (dishId, componentId);
+
+        if (compositionDish == null) {
+            // Если связь не найдена, редирект на список компонентов
+            return "redirect:/categorys/dishes/components/" + dishId;
+        }
+
+        Dishe dish = dishService.findById(dishId);
+        Component component = componentService.findById(componentId);
+
+        model.addAttribute("dish", dish);
+        model.addAttribute("dishId", dishId);
+        model.addAttribute("component", component);
+        model.addAttribute("quantity", compositionDish.getQuantity());
+       // model.addAttribute("isEdit", true);
+
+        return "forms/components-form";
+    }
+
+    // Удалить компонент
+    @GetMapping("/delete/{dishId}/{componentId}")
+    public String deleteDish(@PathVariable("dishId") Integer dishId,
+                             @PathVariable("componentId") Integer componentId,
+                             Model model) {
+        // Находим связь между блюдом и компонентом
+        CompositionDish compositionDish = compositionDishService.findByDishIdAndComponentId (dishId, componentId);
+
+        //Integer categoryId = dish.getTypeOfDish().getCodeType();
+        //Уаление связи между блюдом и его компонентом
+        compositionDishService.deleteRelationComponent(dishId,componentId);
+        //Уаление свмого компонента
+        componentService.deleteComponent(componentId);
+
+        // Перенаправляем обратно в категорию
+        return "redirect:/categorys/dishes/components/" + dishId;
+    }
 
 
     // 1. Показать все компоненты блюда

@@ -96,13 +96,12 @@
 <!-- Информация о компоненте -->
 <div th:if="${component != null}">
     <h2>Компонент: <span th:text="${component.title}"></span></h2>
-    <p>Цена компонента: <span th:text="${component.price}"></span> руб.</p>
     <p>Код компонента: <span th:text="${component.codeComponent}"></span></p>
 </div>
 
-<!-- Ссылка назад -->
-<a th:href="@{/categorys/dishes/components}">← Назад к списку компонентов</a>
-
+<!-- Ссылка назад
+<a th:href="@{/categorys/dishes/components/{codeComponent}(codeComponent=${component.codeComponent})}">← Назад к списку компонентов</a>
+-->
 <!-- Таблица микроэлементов -->
 <div th:if="${compositions != null and !compositions.isEmpty()}">
     <h3>Состав микроэлементов компонента:</h3>
@@ -129,7 +128,7 @@
             <!-- Название микроэлемента -->
             <td>
                 <span th:if="${comp.microelement != null}"
-                      th:text="${comp.microelement.name}">Название микроэлемента</span>
+                      th:text="${comp.microelement.title}">Название микроэлемента</span>
                 <span th:unless="${comp.microelement != null}" style="color: gray;">
                     Микроэлемент ID: <span th:text="${comp.microelementId}"></span>
                 </span>
@@ -140,13 +139,13 @@
 
             <!-- Действия -->
             <td>
-                <!-- Исправьте ссылки на microelement, а не на dish! -->
-                <a th:href="@{/categorys/dishes/components/microelements/{componentId}/edit/{microId}(componentId=${component.codeComponent}, microId=${comp.microelement.codeMicroelement})}"
+
+                <a th:href="@{/categorys/dishes/components/microelements/edit/{codeComponent}/{microId}(codeComponent=${component.codeComponent},microId=${comp.microelement.codeMicroelement})}"
                    class="btn btn-edit">
                     Редактировать
                 </a>
 
-                <a th:href="@{/categorys/dishes/components/microelements/{componentId}/delete/{microId}(componentId=${component.codeComponent}, microId=${comp.microelement.codeMicroelement})}"
+                <a th:href="@{/categorys/dishes/components/microelements/delete/{codeComponent}/{microId}(codeComponent=${component.codeComponent},microId=${comp.microelement.codeMicroelement})}"
                    class="btn btn-delete">
                     Удалить
                 </a>
@@ -156,49 +155,13 @@
     </table>
 </div>
 
-<!-- Сообщение, если микроэлементов нет -->
-<div th:if="${compositions == null or compositions.isEmpty()}" class="empty-message">
-    <p>⚠️ Для этого компонента еще не добавлены микроэлементы.</p>
-
-    <div th:if="${allMicroelements != null and !allMicroelements.isEmpty()}">
-        <p>Доступные микроэлементы для добавления:</p>
-        <ul>
-            <!-- Исправьте: allMicroelements, а не allComponents! -->
-            <li th:each="microelement : ${allMicroelements}">
-                <span th:text="${microelement.title}"></span>
-                (ID: <span th:text="${microelement.codeMicroelement}"></span>)
-            </li>
-        </ul>
-    </div>
 </div>
-
-<!-- Форма для добавления нового микроэлемента -->
-<div style="margin-top: 30px; border: 1px solid #ccc; padding: 20px; border-radius: 5px;">
-    <h3>Добавить новый микроэлемент к компоненту:</h3>
-    <form th:action="@{/categorys/dishes/components/microelements/{componentId}/add(componentId=${component.codeComponent})}"
-          method="post">
-        <div style="margin-bottom: 15px;">
-            <label for="microelementId">Выберите микроэлемент:</label>
-            <select id="microelementId" name="microelementId" required style="width: 100%; padding: 8px;">
-                <option value="">-- Выберите микроэлемент --</option>
-                <option th:each="microelement : ${allMicroelements}"
-                        th:value="${microelement.codeMicroelement}"
-                        th:text="${microelement.title} + ' (ID: ' + ${microelement.codeMicroelement} + ')'">
-                </option>
-            </select>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <label for="quantityPer100">Количество на 100 г:</label>
-            <input type="number" id="quantityPer100" name="quantityPer100"
-                   step="0.01" min="0" required style="width: 100%; padding: 8px;">
-        </div>
-
-        <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px;
-                text-decoration: none; border-radius: 5px; border: none; cursor: pointer;">
-            ➕ Добавить микроэлемент
-        </button>
-    </form>
+<!-- Кнопка для добавления нового микроэелемента к блюду -->
+<div style="margin-top: 30px;">
+    <a th:href="@{/categorys/dishes/components/microelements/new/{codeComponent}(codeComponent=${component.codeComponent})}"
+       style="background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+        ➕ Добавить микроэлемент к этому компоненту
+    </a>
 </div>
 
 </body>

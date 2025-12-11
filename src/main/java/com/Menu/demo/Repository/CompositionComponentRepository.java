@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CompositionComponentRepository extends JpaRepository<CompositionComponent, Integer> {
 
@@ -22,5 +23,13 @@ public interface CompositionComponentRepository extends JpaRepository<Compositio
     // Используем поле из составного ключа
     @Query("SELECT cd FROM CompositionComponent cd WHERE cd.id.componentId = :componentId")
     List<CompositionComponent> findByComponentCode(@Param("componentId") Integer componentId);
+
+    // Используя составной ключ напрямую
+    @Query("SELECT cd FROM CompositionComponent cd WHERE cd.id.componentId = :componentId AND cd.id.microelementId = :microelementId")
+    Optional<CompositionComponent> findByComponentIdAndMicroelementId(@Param("componentId") Integer componentId,
+                                                         @Param("microelementId") Integer microelementId);
+
+    // Удаление
+    void deleteByComponentIdAndMicroelementId(Integer componentId, Integer microelementId);
 
 }

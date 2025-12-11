@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CompositionDishRepository extends JpaRepository<CompositionDish, Integer> {
     // Найти конкретную запись по обеим частям ключа
@@ -15,9 +16,17 @@ public interface CompositionDishRepository extends JpaRepository<CompositionDish
 
     List<CompositionDish> findByDishDishesId(Integer dishId);
 
-    // Вариант 1: Используем поле из составного ключа (САМЫЙ ПРАВИЛЬНЫЙ!)
+    //  Используем поле из составного ключа
     @Query("SELECT cd FROM CompositionDish cd WHERE cd.id.dishId = :dishId")
     List<CompositionDish> findByDishId(@Param("dishId") Integer dishId);
+
+    // Используя составной ключ напрямую
+    @Query("SELECT cd FROM CompositionDish cd WHERE cd.id.dishId = :dishId AND cd.id.componentId = :componentId")
+    Optional<CompositionDish> findByDishIdAndComponentId(@Param("dishId") Integer dishId,
+                                                         @Param("componentId") Integer componentId);
+
+    // Удаление
+    void deleteByDishIdAndComponentId(Integer dishId, Integer componentId);
 
 //    // Вариант 2: Если хотите по связанной сущности, убедитесь что правильно названо поле
 //    @Query("SELECT cd FROM CompositionDish cd WHERE cd.dish.id = :dishId")

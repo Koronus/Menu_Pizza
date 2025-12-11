@@ -1,10 +1,10 @@
 package com.Menu.demo.Service;
 
-import com.Menu.demo.Entity.Component;
 import com.Menu.demo.Entity.CompositionDish;
 import com.Menu.demo.Repository.CompositionDishRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,6 +25,12 @@ public class CompositionDisheService {
         // return compositionDishRepository.findByDishId(dishId);
     }
 
+    public CompositionDish findByDishIdAndComponentId(Integer dishId, Integer componentId) {
+        // Используем Optional для безопасной обработки
+        return compositionDishRepository.findByDishIdAndComponentId(dishId, componentId)
+                .orElse(null);
+    }
+
 
     public void saveCompositionDishe(CompositionDish compositionDish) { compositionDishRepository.save(compositionDish);}
 
@@ -33,5 +39,10 @@ public class CompositionDisheService {
 //                .stream()
 //                .findFirst();
 //    }
+
+    //Удаление компонента
+    @Transactional
+    public void deleteRelationComponent(Integer dishId, Integer componentId){compositionDishRepository.deleteByDishIdAndComponentId(dishId,componentId);}
+
 }
 

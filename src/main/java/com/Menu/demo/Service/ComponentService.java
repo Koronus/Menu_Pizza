@@ -29,4 +29,6 @@ public class ComponentService {
 
     public void saveComponent(Component component) { componentRepository.save(component);}
 
+    public void deleteComponent(Integer id) {componentRepository.deleteById(id);}
+
 }

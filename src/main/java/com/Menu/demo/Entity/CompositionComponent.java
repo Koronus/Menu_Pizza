@@ -19,12 +19,24 @@ public class CompositionComponent {
     private Integer microelementId;
 
 
-    @ManyToOne
-    @JoinColumn(name = "code_component",referencedColumnName = "code_component" )
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "code_component",
+            referencedColumnName = "code_component",
+            insertable = false,  // ← Не вставлять при сохранении
+            updatable = false    // ← Не обновлять
+    )
     private Component component;
 
-    @ManyToOne
-    @JoinColumn(name = "code_microelement",referencedColumnName = "code_microelement")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "code_microelement",
+            referencedColumnName = "code_microelement",
+            insertable = false,  // ← Не вставлять при сохранении
+            updatable = false    // ← Не обновлять
+    )
     private Microelement microelement;
 
     @Column(name = "quantity_per_100")
@@ -39,6 +51,21 @@ public class CompositionComponent {
         this.quantityPer100 = quantityPer100;
     }
 
+    public Integer getComponentId() {
+        return componentId;
+    }
+
+    public void setComponentId(Integer componentId) {
+        this.componentId = componentId;
+    }
+
+    public Integer getMicroelementId() {
+        return microelementId;
+    }
+
+    public void setMicroelementId(Integer microelementId) {
+        this.microelementId = microelementId;
+    }
 
     public Component getComponent() {
         return component;
