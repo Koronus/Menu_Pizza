@@ -23,16 +23,40 @@ public interface ComponentRepository extends JpaRepository<Component, Integer> {
 
     List<Component> findByPriceLessThan(BigDecimal price);
 
-    // Компоненты с фильтрацией по цене
-    @Query("SELECT c FROM Component c " +
-            "WHERE (:minPrice IS NULL OR c.price >= :minPrice) " +
-            "AND (:maxPrice IS NULL OR c.price <= :maxPrice) " +
-            "ORDER BY c.price DESC")
-    List<Component> findByPriceRange(
-            @Param("minPrice") BigDecimal minPrice,
-            @Param("maxPrice") BigDecimal maxPrice);
+    // 2. Отчет: Анализ компонентов
+    @Query(value = """
+        SELECT 
+            c.code_component AS componentId,
+            c.title AS componentName,
+            c.price,
+            c.calorie,
+            c.weight,
+            COUNT(DISTINCT cd.dishesid) AS usedInDishes,
+            ARRAY_AGG(DISTINCT d.title) AS dishNames
+        FROM components c
+        LEFT JOIN composition_dishes cd ON c.code_component = cd.code_component  
+        LEFT JOIN dishes d ON cd.dishesid = d.dishesid
+        WHERE (:minPrice IS NULL OR c.price >= :minPrice)
+          AND (:maxPrice IS NULL OR c.price <= :maxPrice)
+        GROUP BY c.code_component, c.title, c.price, c.calorie, c.weight
+        ORDER BY COUNT(DISTINCT cd.dishesid) DESC
+        """, nativeQuery = true)
+    List<Object[]> findComponentsAnalysis(@Param("minPrice") Double minPrice,
+                                          @Param("maxPrice") Double maxPrice);
 
-    // Компоненты с калорийностью выше указанной
-    List<Component> findByCalorieGreaterThan(BigDecimal calorie);
+    // 3. Отчет: Анализ питательности
+    @Query(value = """
+        SELECT 
+            c.title AS componentName,
+            c.calorie,
+            c.price,
+            m.title AS microelementName,
+            cc.quantity_per_100 AS quantityPer100
+        FROM components c
+        LEFT JOIN composition_components cc ON c.code_component = cc.code_component  
+        LEFT JOIN microelements m ON cc.code_microelement = m.code_microelement
+        ORDER BY c.title, cc.quantity_per_100 DESC
+        """, nativeQuery = true)
+    List<Object[]> findNutritionReportData();
 }
 

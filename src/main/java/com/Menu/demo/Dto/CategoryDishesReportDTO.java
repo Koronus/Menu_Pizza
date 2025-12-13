@@ -1,15 +1,18 @@
 package com.Menu.demo.Dto;
 
+
+
+
 import java.math.BigDecimal;
 
-public class CategoryDishesDTO {
+
+
+public class CategoryDishesReportDTO {
     private String categoryName;
     private Long dishCount;
     private BigDecimal totalPrice;
     private BigDecimal avgPrice;
-    private BigDecimal revenueShare; // вычисляемое поле
-
-    // геттеры/сеттеры
+    private BigDecimal revenueShare;
 
     public String getCategoryName() {
         return categoryName;

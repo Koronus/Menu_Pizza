@@ -1,11 +1,12 @@
 package com.Menu.demo.Dto;
 
+
 import java.math.BigDecimal;
+
 
 public class MicroelementInfoDTO {
     private String microelementName;
     private BigDecimal quantityPer100;
-    // геттеры/сеттеры
 
     public String getMicroelementName() {
         return microelementName;

@@ -1,10 +1,12 @@
 package com.Menu.demo.Dto;
 
+
+
 import java.math.BigDecimal;
 import java.util.List;
 
-// DTO для отчета 2
-public class ComponentAnalysisDTO {
+
+public class ComponentAnalysisReportDTO {
     private Integer componentId;
     private String componentName;
     private BigDecimal price;
@@ -12,16 +14,6 @@ public class ComponentAnalysisDTO {
     private BigDecimal weight;
     private Long usedInDishes;
     private List<String> dishNames;
-
-    // вычисляемое поле - популярность
-    public String getPopularityLevel() {
-        if (usedInDishes == null) return "Нет данных";
-        if (usedInDishes > 5) return "Высокая";
-        if (usedInDishes > 2) return "Средняя";
-        return "Низкая";
-    }
-
-    // геттеры/сеттеры
 
     public Integer getComponentId() {
         return componentId;
@@ -79,8 +71,4 @@ public class ComponentAnalysisDTO {
         this.dishNames = dishNames;
     }
 }
-
-
-
-    // геттеры/сеттеры
 

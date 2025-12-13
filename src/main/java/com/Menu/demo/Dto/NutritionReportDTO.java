@@ -1,27 +1,26 @@
 package com.Menu.demo.Dto;
 
+
 import java.math.BigDecimal;
 import java.util.List;
 
-// DTO для отчета 3
+
+
+import java.math.BigDecimal;
+import java.util.List;
+
 public class NutritionReportDTO {
     private String componentName;
     private BigDecimal calorie;
     private BigDecimal price;
     private List<MicroelementInfoDTO> microelements;
     private BigDecimal totalMicroelements;
-    private BigDecimal caloriePerRuble; // вычисляемое поле
+    private BigDecimal caloriePerRuble;
 
-    // вычисляемое поле - уровень питательности
-    public String getNutritionLevel() {
-        if (calorie == null) return "Нет данных";
-        if (calorie.compareTo(new BigDecimal("200")) > 0) return "Высокая";
-        if (calorie.compareTo(new BigDecimal("100")) > 0) return "Средняя";
-        return "Низкая";
-    }
+    // Конструкторы
+    public NutritionReportDTO() {}
 
-    // геттеры/сеттеры
-
+    // Геттеры и сеттеры
     public String getComponentName() {
         return componentName;
     }

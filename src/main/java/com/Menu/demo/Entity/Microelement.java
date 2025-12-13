@@ -22,7 +22,7 @@ public class Microelement {
 
     public Microelement() {}
 
-    public Microelement(Integer codeMicroelement, String title, List<CompositionComponent> compositionComponents, DailyRecruitment dailyRecruitment) {
+    public Microelement(Integer codeMicroelement, String title, List<CompositionComponent> compositionComponents) {
         this.codeMicroelement = codeMicroelement;
         this.title = title;
         this.compositionComponents = compositionComponents;

@@ -14,17 +14,32 @@ public interface DisheRepository extends JpaRepository<Dishe, Integer> {
     @Query("SELECT d FROM Dishe d WHERE d.typeOfDish.codeType = :categoryId")
     List<Dishe> findByCategory(@Param("categoryId") Integer categoryId);
 
-    // Для отчета 1: количество блюд по всем категориям
-    @Query("SELECT c.title, COUNT(d), SUM(d.price), AVG(d.price) " +
-            "FROM Dishe d JOIN d.typeOfDish c " +
-            "GROUP BY c.codeType, c.title")
+    // 1. Отчет: Блюда по категориям - ВСЕ КАТЕГОРИИ
+    @Query(value = """
+        SELECT 
+            tod.title_types_of_dishes AS categoryName,
+            COUNT(d.dishesid) AS dishCount,
+            COALESCE(SUM(d.price), 0) AS totalPrice,
+            COALESCE(AVG(d.price), 0) AS avgPrice
+        FROM types_of_dishes tod
+        LEFT JOIN dishes d ON tod.code_type = d.code_type
+        GROUP BY tod.code_type, tod.title_types_of_dishes
+        ORDER BY tod.title_types_of_dishes
+        """, nativeQuery = true)
     List<Object[]> findDishesCountByAllCategories();
 
-    // Для отчета 1: для конкретной категории
-    @Query("SELECT c.title, COUNT(d), SUM(d.price), AVG(d.price) " +
-            "FROM Dishe d JOIN d.typeOfDish c " +
-            "WHERE c.codeType = :categoryId " +
-            "GROUP BY c.codeType, c.title")
+    // 2. Отчет: Блюда по категориям - КОНКРЕТНАЯ КАТЕГОРИЯ
+    @Query(value = """
+        SELECT 
+            tod.title_types_of_dishes AS categoryName,
+            COUNT(d.dishesid) AS dishCount,
+            COALESCE(SUM(d.price), 0) AS totalPrice,
+            COALESCE(AVG(d.price), 0) AS avgPrice
+        FROM types_of_dishes tod
+        LEFT JOIN dishes d ON tod.code_type = d.code_type
+        WHERE tod.code_type = :categoryId
+        GROUP BY tod.code_type, tod.title_types_of_dishes
+        """, nativeQuery = true)
     List<Object[]> findDishesCountByCategoryId(@Param("categoryId") Integer categoryId);
 
     // Найти блюда по категории
